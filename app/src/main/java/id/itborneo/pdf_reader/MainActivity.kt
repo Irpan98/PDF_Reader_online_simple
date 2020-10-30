@@ -8,18 +8,19 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager.widget.ViewPager
-import com.necistudio.vigerpdf.adapter.VigerAdapterV2
 import com.necistudio.vigerpdf.manage.OnResultListenerV2
 import com.necistudio.vigerpdf.utils.ViewPagerZoomHorizontal
+import id.itborneo.pdf_reader.VigerCustom.VigerAdapterV2Custom
+import id.itborneo.pdf_reader.VigerCustom.VigerPDFv2Custom
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
     private var viewPager: ViewPager? = null
-    private var itemDataV2: ArrayList<ByteArray>? = null
-    private var adapterV2: VigerAdapterV2? = null
-    private var vigerPDFV2: VigerPDFv2Custom? = null
+    private lateinit var itemDataV2: ArrayList<ByteArray>
+    private lateinit var adapterV2: VigerAdapterV2Custom
+    private lateinit var vigerPDFV2: VigerPDFv2Custom
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,26 +36,27 @@ class MainActivity : AppCompatActivity() {
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private fun setupV2() {
         vigerPDFV2 = VigerPDFv2Custom(this)
-        btnCancle?.setOnClickListener { vigerPDFV2!!.cancel() }
+//        btnCancle?.setOnClickListener { vigerPDFV2.cancel() }
+//
+//        btnNetwork.setOnClickListener {
+//            itemDataV2.clear()
+//            adapterV2.notifyDataSetChanged()
+////            fromNetwork("http://www.pdf995.com/samples/pdf.pdf")
+//
+//
+////            fromNetwork("https://sholva.untan.org/ppta/10%20Contoh%20Bab%201%20Skripsi%20BINUS.pdf")
+//        }
 
-        btnNetwork.setOnClickListener {
-            itemDataV2!!.clear()
-            adapterV2!!.notifyDataSetChanged()
-                            fromNetwork("http://www.pdf995.com/samples/pdf.pdf");
-//            fromNetwork("http://192.168.43.46/project_baca_suara/m.pdf")
-
-
-//            fromNetwork("https://sholva.untan.org/ppta/10%20Contoh%20Bab%201%20Skripsi%20BINUS.pdf")
-        }
         itemDataV2 = ArrayList()
-        adapterV2 = VigerAdapterV2(applicationContext, itemDataV2)
+        adapterV2 = VigerAdapterV2Custom(applicationContext, itemDataV2)
         viewPager?.adapter = adapterV2
 
+        fromNetwork("http://192.168.43.46/project_baca_suara/m.pdf")
 
-        btnCancle.setOnClickListener {
-            nextPage()
-
-        }
+//        btnCancle.setOnClickListener {
+//            nextPage()
+//
+//        }
     }
 
     private fun nextPage() {
@@ -70,13 +72,13 @@ class MainActivity : AppCompatActivity() {
         progressDialog.setMessage("Loading...")
         progressDialog.setCancelable(false)
         progressDialog.show()
-        itemDataV2!!.clear()
-        adapterV2!!.notifyDataSetChanged()
-        vigerPDFV2!!.cancel()
-        vigerPDFV2!!.initFromNetwork(endpoint, object : OnResultListenerV2 {
+        itemDataV2.clear()
+        adapterV2.notifyDataSetChanged()
+        vigerPDFV2.cancel()
+        vigerPDFV2.initFromNetwork(endpoint, object : OnResultListenerV2 {
             override fun resultData(data: ByteArray) {
                 Log.e("data", "run")
-                itemDataV2!!.add(data)
+                itemDataV2.add(data)
             }
 
             override fun progressData(progress: Int) {
@@ -91,7 +93,7 @@ class MainActivity : AppCompatActivity() {
 
             override fun onComplete() {
                 progressDialog.dismiss()
-                adapterV2!!.notifyDataSetChanged()
+                adapterV2.notifyDataSetChanged()
             }
         })
 
@@ -101,6 +103,6 @@ class MainActivity : AppCompatActivity() {
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     override fun onDestroy() {
         super.onDestroy()
-        if (vigerPDFV2 != null) vigerPDFV2!!.cancel()
+        vigerPDFV2.cancel()
     }
 }
